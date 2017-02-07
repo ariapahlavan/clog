@@ -22,8 +22,54 @@
 #define MAX_LOG_DEF_ARGS 4
 
 
+/**
+ * PTR         ---->   Pointer
+ * CHAR        ---->   Character
+ * INT_8       ---->   8-bit integer (decimal and hex format)
+ * INT_16      ---->   16-bit integer (decimal and hex format)
+ * INT_32      ---->   32-bit integer (decimal and hex format)
+ * INT_64      ---->   64-bit integer (decimal and hex format)
+ * UINT_8      ---->   8-bit unsigned integer (decimal and hex format)
+ * UINT_16     ---->   16-bit unsigned integer (decimal and hex format)
+ * UINT_32     ---->   32-bit unsigned integer (decimal and hex format)
+ * UINT_64     ---->   64-bit unsigned integer (decimal and hex format)
+ * STR         ---->   String
+ * INT         ---->   Integer (decimal and hex format)
+ * LONG        ---->   Long (decimal and hex format)
+ * LONG_INT    ---->   Long integer (decimal and hex format)
+ * ULONG       ---->   Unsigned long (decimal and hex format)
+ * ULONG_INT   ---->   Unsigned long integer (decimal and hex format)
+ * S           ---->   String
+ * I           ---->   Integer (decimal and hex format)
+ * Id          ---->   Integer (decimal format)
+ * Ix          ---->   Integer (hex format)
+ * L           ---->   Long (decimal and hex format)
+ * C           ---->   Character
+ * P           ---->   Pointer
+ * I8          ---->   8-bit integer (decimal and hex format)
+ * I16         ---->   16-bit integer (decimal and hex format)
+ * I32         ---->   32-bit integer (decimal and hex format)
+ * I64         ---->   64-bit integer (decimal and hex format)
+ * UI          ---->   Unsigned Integer (decimal and hex format)
+ * UI8         ---->   8-bit unsigned integer (decimal and hex format)
+ * UI16        ---->   16-bit unsigned integer (decimal and hex format)
+ * UI32        ---->   32-bit unsigned integer (decimal and hex format)
+ * UI64        ---->   64-bit unsigned integer (decimal and hex format)
+ * UL          ---->   Unsigned Long (decimal and hex format)
+ * ULI         ---->   Unsigned long Integer (decimal and hex format)
+ * LI          ---->   Long integer (decimal and hex format)
+ * N           ---->   New line
+ * ENDL        ---->   New line
+ * T           ---->   Tab
+ * TAB         ---->   Tab
+ * EOL         ---->   End of log
+ *
+ * Clarification:
+ *      decimal and hex format:     16 (0x10)
+ *      decimal format:             16
+ *      hex format:                 0x10
+ */
 enum DATA_TYPE {
-    INSTRUCTION,
     PTR,
     CHAR,
     INT_8,
