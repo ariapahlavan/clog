@@ -13,15 +13,6 @@
 #define EMPTY_VAL 0
 #define LOG_LEVEL DEBUG
 
-int main(char *argv[], int argc) {
-    int j, *ip;
-    j = 20;
-    ip = &j;
-    logging(S, "Hello world!", N, S, "the pointer is:", ENDL, T, P, ip, N, S, "whose value is:", N, T, Id, j, warn);
-
-    exit(0);
-}
-
 void printList(int num, va_list valist) {
     int i;
     num *= 2;
@@ -177,8 +168,7 @@ void logging(int num, ...) {
     enum LOG_LEVELS lvl;
     void *values[100];
     enum DATA_TYPE tags[100];
-    enum DATA_TYPE TAG;
-    void *V;
+    enum DATA_TYPE tag;
 
     /* initialize valist for num number of arguments */
     va_start(valist, MAX_LOG_DEF_ARGS);
@@ -188,9 +178,9 @@ void logging(int num, ...) {
     values[cur_indx] = va_arg(valist, void *);
     cur_indx++;
 
-    while ((TAG = va_arg(valist, enum DATA_TYPE)) != EOL) {
-        tags[cur_indx] = TAG;
-        if (TAG == ENDL || TAG == N || TAG == TAB || TAG == T) {
+    while ((tag = va_arg(valist, enum DATA_TYPE)) != EOL) {
+        tags[cur_indx] = tag;
+        if (tag == ENDL || tag == N || tag == TAB || tag == T) {
             cur_indx++;
             continue;
         }
@@ -211,8 +201,8 @@ void logging(int num, ...) {
 void printLog(const char *func, int line, enum LOG_LEVELS level, int length, void *const *values,
               const enum DATA_TYPE *tags, bool header) {
     int i;
-    enum DATA_TYPE TAG;
-    void *V;
+    enum DATA_TYPE tag;
+    void *val;
     if (level >= LOG_LEVEL) {
         int curLogNum = getLogNum();
 
@@ -223,14 +213,14 @@ void printLog(const char *func, int line, enum LOG_LEVELS level, int length, voi
 
         /* access all the arguments assigned to valist */
         for (i = 0; i < length; i++) {
-            TAG = tags[i];
+            tag = tags[i];
 
-            if (TAG == N || TAG == ENDL || TAG == TAB || TAG == T)
-                V = EMPTY_VAL;
+            if (tag == N || tag == ENDL || tag == TAB || tag == T)
+                val = EMPTY_VAL;
             else
-                V = values[i];
+                val = values[i];
 
-            output(V, TAG);
+            output(val, tag);
         }
 
         setColorPrint(level);
@@ -254,8 +244,7 @@ void loggingNoHeader(int num, ...) {
     enum LOG_LEVELS lvl;
     void *values[100];
     enum DATA_TYPE tags[100];
-    enum DATA_TYPE TAG;
-    void *V;
+    enum DATA_TYPE tag;
 
     /* initialize valist for num number of arguments */
     va_start(valist, MAX_LOG_DEF_ARGS);
@@ -265,9 +254,9 @@ void loggingNoHeader(int num, ...) {
     values[cur_indx] = va_arg(valist, void *);
     cur_indx++;
 
-    while ((TAG = va_arg(valist, enum DATA_TYPE)) != EOL) {
-        tags[cur_indx] = TAG;
-        if (TAG == ENDL || TAG == N || TAG == TAB || TAG == T) {
+    while ((tag = va_arg(valist, enum DATA_TYPE)) != EOL) {
+        tags[cur_indx] = tag;
+        if (tag == ENDL || tag == N || tag == TAB || tag == T) {
             cur_indx++;
             continue;
         }

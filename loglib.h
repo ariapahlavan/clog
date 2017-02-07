@@ -65,9 +65,9 @@
  * EOL         ---->   End of log
  *
  * Clarification:
- *      decimal and hex format:     16 (0x10)
- *      decimal format:             16
- *      hex format:                 0x10
+ *      logging(I, 16, debug)   --->   16 (0x10)
+ *      logging(Id, 16, debug)  --->   16
+ *      logging(Ix, 16, debug)  --->   0x10
  */
 enum DATA_TYPE {
     PTR,
