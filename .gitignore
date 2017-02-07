@@ -1,5 +1,4 @@
 # Object files
-*.o
 *.ko
 *.obj
 *.elf
@@ -22,7 +21,6 @@
 
 # Executables
 *.exe
-*.out
 *.app
 *.i*86
 *.x86_64
@@ -31,3 +29,10 @@
 # Debug files
 *.dSYM/
 *.su
+.idea/
+CMakeLists.txt
+cmake-build-debug/
+/CMakeScripts
+/install_manifest.txt
+/CTestTestfile.cmake
+*.asm
