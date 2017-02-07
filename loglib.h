@@ -15,8 +15,15 @@
 #define AMAG  "\x1B[35m"
 #define ACYN  "\x1B[36m"
 #define AWHT  "\x1B[37m"
+#define debug EOL, __FUNCTION__, __LINE__, DEBUG
+#define info EOL, __FUNCTION__, __LINE__, INFO
+#define warn EOL, __FUNCTION__, __LINE__, WARN
+#define error EOL, __FUNCTION__, __LINE__, ERROR
+#define MAX_LOG_DEF_ARGS 4
 
-enum DATA_TYPE{
+
+enum DATA_TYPE {
+    INSTRUCTION,
     PTR,
     CHAR,
     INT_8,
@@ -35,6 +42,8 @@ enum DATA_TYPE{
     ULONG_INT,
     S,
     I,
+    Id,
+    Ix,
     L,
     C,
     P,
@@ -53,7 +62,8 @@ enum DATA_TYPE{
     N,
     ENDL,
     T,
-    TAB
+    TAB,
+    EOL
 };
 
 enum LOG_LEVELS{
@@ -67,27 +77,35 @@ enum LOG_LEVELS{
 const static char * enumStrings[] = {"DEBUG", "INFO", "WARN", "ERROR"};
 
 
-void loggingMsg(enum LOG_LEVELS lvl, char * msg);
-
 /**
- * Example:
- *       logging(DEBUG,
- *               1,
- *               S, "Some message"
- *       );
- * @param lvl
- *          logging level of this file
- * @param num
- *          number of message arguments
- * @param ...
- *          message arguments
- *          (S, ""
- *              or
- *          I, 1
- *              or
- *          C, 'a')
+ * log your message with any number of arguments: string(S), int(I), int8_t(I8),
+ *      double(D), long(L), Char(C), pointer(P), etc.,
+ *      suffixed with proper log level: debug, info, warn, error
+ *
+ *
+ *
+ * Example 1:
+ *
+ *       logging(S, "My age is: ", Id, 23, debug);
+ *
+ * OUTPUT: [DEBUG]: <Caller Function> -> <Line Number> (<Log Number>)
+ *         My age is 23  (<Log Number>)
+ *
+ *
+ *
+ * Example 2:
+ *
+ *       logging(C, 'c', S, " is not a valid character.", ENDL,
+ *               S, "exit with error code ", I, 4, error);
+ *
+ * OUTPUT: [ERROR]: <Caller Function> -> <Line Number> (<Log Number>)
+ *         c is not a valid character.
+ *         exit with error code 4 (0x4) (<Log Number>)
+ *
  */
-void logging(enum LOG_LEVELS lvl, int num, ...);
+void logging(int num, ...);
+
+void loggingMsg(const char *msg, enum DATA_TYPE t, const char *func, int line, enum LOG_LEVELS lvl);
 
 void print(int num, ...);
 

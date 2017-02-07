@@ -6,26 +6,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include "loglib.h"
 
 
 #define EMPTY_VAL 0
 #define LOG_LEVEL DEBUG
 
+int main(char* argv[], int argc){
+    loggingNoHeader(S, "Hello world!", debug);
+    exit(0);
+}
 
-void printLogLabel(enum LOG_LEVELS lvl);
-
-void outputDouble(double value);
-
-void output(void *V, enum DATA_TYPE Type);
-
-void printList(int num, va_list valist);
-
-void printLog(int num, va_list valist);
-
-void colorPrint(enum LOG_LEVELS lvl, const char *txt);
-
-void printList(int num, va_list valist){
+void printList(int num, va_list valist) {
     int i;
     num *= 2;
 
@@ -45,29 +38,6 @@ void printList(int num, va_list valist){
         }
 
         output(V, T);
-    }
-}
-
-void printLog(int num, va_list valist){
-    int i;
-    num *= 2;
-
-    enum DATA_TYPE T;
-    void *V;
-
-    for (i = 0; i < num;) {
-        T = va_arg(valist, enum DATA_TYPE);
-
-        if (T == N || T == ENDL) {
-            V = EMPTY_VAL;
-            T == ENDL ? i += 2 : 0;
-            output(V, T);
-            printf("\t\t ");
-        } else {
-            V = va_arg(valist, void *);
-            i += 2;
-            output(V, T);
-        }
     }
 }
 
@@ -102,7 +72,6 @@ void outputDouble(double value) {
 }
 
 void output(void *V, enum DATA_TYPE Type) {
-
     switch (Type) {
         case P:
         case PTR:
@@ -118,55 +87,61 @@ void output(void *V, enum DATA_TYPE Type) {
             break;
         case I8:
         case INT_8:
-            printf("%d", (int8_t) V);
+            printf("%d %s(0x%X)%s", (int8_t) V, AWHT, (int8_t) V, ANRM);
             break;
         case I16:
         case INT_16:
-            printf("%d", (int16_t) V);
+            printf("%d %s(0x%X)%s", (int16_t) V, AWHT, (int16_t) V, ANRM);
             break;
         case I32:
         case INT_32:
-            printf("%d", (int32_t) V);
+            printf("%d %s(0x%X)%s", (int32_t) V, AWHT, (int32_t) V, ANRM);
             break;
         case I64:
         case INT_64:
-            printf("%d", (int64_t) V);
+            printf("%ld %s(0x%lX)%s", (int64_t) V, AWHT, (int64_t) V, ANRM);
             break;
         case UI8:
         case UINT_8:
-            printf("%u", (__uint8_t) V);
+            printf("%u %s(0x%X)%s", (uint8_t) V, AWHT, (uint8_t) V, ANRM);
             break;
         case UI16:
         case UINT_16:
-            printf("%u", (__uint16_t) V);
+            printf("%u %s(0x%X)%s", (uint16_t) V, AWHT, (uint16_t) V, ANRM);
             break;
         case UI32:
         case UINT_32:
-            printf("%u", (__uint32_t) V);
+            printf("%u %s(0x%X)%s", (uint32_t) V, AWHT, (uint32_t) V, ANRM);
             break;
         case UI64:
         case UINT_64:
-            printf("%u", (__uint64_t) V);
+            printf("%llu %s(0x%llX)%s", (uint64_t) V, AWHT, (uint64_t) V, ANRM);
             break;
         case I:
         case INT:
+            printf("%d %s(0x%X)%s", (int) V, AWHT, (int) V, ANRM);
+            break;
+        case Id:
             printf("%d", (int) V);
+            break;
+        case Ix:
+            printf("0x%X", (int) V);
             break;
         case L:
         case LONG:
-            printf("%ld", (long) V);
+            printf("%ld %s(0x%lX)%s", (long) V, AWHT, (long) V, ANRM);
             break;
         case LI:
         case LONG_INT:
-            printf("%ld", (long int) V);
+            printf("%ld %s(0x%lX)%s", (long int) V, AWHT, (long int) V, ANRM);
             break;
         case UL:
         case ULONG:
-            printf("%lu", (unsigned long) V);
+            printf("%lu %s(0x%lX)%s", (unsigned long) V, AWHT, (unsigned long) V, ANRM);
             break;
         case ULI:
         case ULONG_INT:
-            printf("%lu", (unsigned long int) V);
+            printf("%lu %s(0x%lX)%s", (unsigned long int) V, AWHT, (unsigned long int) V, ANRM);
             break;
         case N:
         case ENDL:
@@ -181,49 +156,170 @@ void output(void *V, enum DATA_TYPE Type) {
     }
 }
 
-void loggingMsg(enum LOG_LEVELS lvl, char *msg) {
-    printLogLabel(lvl);
-    printf("%s", msg);
-    colorPrint(lvl, "\n---------------------------\n");
+void loggingMsg(const char *msg, enum DATA_TYPE t, const char *func, int line, enum LOG_LEVELS lvl) {
+    if (lvl >= LOG_LEVEL) {
+        int curLogNum = getLogNum();
+        setColorPrint(lvl);
+        printf("[%s]: func:'%s' → line:%d (%d)%s\n%s", enumStrings[lvl], func, line, curLogNum, ANRM, msg);
+        setColorPrint(lvl);
+        printf(" (%d)%s\n", curLogNum, ANRM);
+    }
 }
 
-void logging(enum LOG_LEVELS lvl, int num, ...) {
+void logging(int num, ...) {
     va_list valist;
+    char *func;
+    int line, cur_indx = 0, i;
+    enum LOG_LEVELS lvl;
+    void *values[100];
+    enum DATA_TYPE tags[100];
+    enum DATA_TYPE T;
+    void *V;
 
     /* initialize valist for num number of arguments */
-    va_start(valist, num);
+    va_start(valist, MAX_LOG_DEF_ARGS);
+    if (num == EOL) return;
 
-    if (lvl >= LOG_LEVEL) {
-        printLogLabel(lvl);
-        if (lvl == INFO || lvl == WARN) printf(" ");
-        printLog(num, valist);
-        colorPrint(lvl, "\n---------------------------\n");
+    tags[cur_indx] = num;
+    values[cur_indx] = va_arg(valist, void *);
+    cur_indx++;
+
+    while ((T = va_arg(valist, enum DATA_TYPE)) != EOL) {
+        tags[cur_indx] = T;
+        if (T == ENDL) {
+            cur_indx++;
+            continue;
+        }
+        values[cur_indx] = va_arg(valist, void *);
+        cur_indx++;
     }
+    func = va_arg(valist, char *);
+    line = va_arg(valist, int);
+    lvl = va_arg(valist, enum LOG_LEVELS);
+
+    printLog(func, line, lvl, cur_indx, values, tags, true);
 
     /* clean memory reserved for valist */
     va_end(valist);
 
 }
 
-void printLogLabel(enum LOG_LEVELS lvl) {
-    printf("[");
-    colorPrint(lvl, enumStrings[lvl]);
-    printf("]: ");
+void printLog(const char *func, int line, enum LOG_LEVELS level, int length, void *const *values,
+              const enum DATA_TYPE *tags, bool header) {
+    int i;
+    enum DATA_TYPE T;
+    void *V;
+    if (level >= LOG_LEVEL) {
+        int curLogNum = getLogNum();
+
+        if (header) {
+            setColorPrint(level);
+            printf("[%s]: func:'%s' → line:%d (%d)\n" ANRM, enumStrings[level], func, line, curLogNum);
+        }
+
+        /* access all the arguments assigned to valist */
+        for (i = 0; i < length;) {
+            T = tags[i];
+
+            if (T == N || T == ENDL) {
+                V = EMPTY_VAL;
+                T == ENDL ? i++ : 0;
+            } else {
+                V = values[i];
+                i++;
+            }
+
+            output(V, T);
+        }
+
+        setColorPrint(level);
+        printf(" (%d)\n" ANRM, curLogNum);
+    }
+}
+
+void loggingMsgNoHeader(const char *msg, enum DATA_TYPE t, const char *func, int line, enum LOG_LEVELS lvl) {
+    if (lvl >= LOG_LEVEL) {
+        int curLogNum = getLogNum();
+        printf("%s", msg);
+        setColorPrint(lvl);
+        printf(" (%d)%s\n", curLogNum, ANRM);
+    }
+}
+
+void loggingNoHeader(int num, ...) {
+    va_list valist;
+    char *func;
+    int line, cur_indx = 0, i;
+    enum LOG_LEVELS lvl;
+    void *values[100];
+    enum DATA_TYPE tags[100];
+    enum DATA_TYPE T;
+    void *V;
+
+    /* initialize valist for num number of arguments */
+    va_start(valist, MAX_LOG_DEF_ARGS);
+    if (num == EOL) return;
+
+    tags[cur_indx] = num;
+    values[cur_indx] = va_arg(valist, void *);
+    cur_indx++;
+
+    while ((T = va_arg(valist, enum DATA_TYPE)) != EOL) {
+        tags[cur_indx] = T;
+        if (T == ENDL) {
+            cur_indx++;
+            continue;
+        }
+        values[cur_indx] = va_arg(valist, void *);
+        cur_indx++;
+    }
+    func = va_arg(valist, char *);
+    line = va_arg(valist, int);
+    lvl = va_arg(valist, enum LOG_LEVELS);
+
+
+    printLog(func, line, lvl, cur_indx, values, tags, false);
+
+    /* clean memory reserved for valist */
+    va_end(valist);
+
+}
+
+int getLogNum() {
+    static int logNum = 0;
+    return logNum++;
 }
 
 void colorPrint(enum LOG_LEVELS lvl, const char *txt) {
     switch (lvl) {
         case DEBUG:
-            printf(AGRN "%s%s", txt, ANRM);
+            printf(ACYN "%s" ANRM, txt);
             break;
         case INFO:
-            printf(ABLU "%s%s", txt, ANRM);
+            printf(ABLU "%s" ANRM, txt);
             break;
         case WARN:
-            printf(AYEL "%s%s", txt, ANRM);
+            printf(AYEL "%s" ANRM, txt);
             break;
         case ERROR:
-            printf(ARED "%s%s", txt, ANRM);
+            printf(ARED "%s" ANRM, txt);
+            break;
+    }
+}
+
+void setColorPrint(enum LOG_LEVELS lvl) {
+    switch (lvl) {
+        case DEBUG:
+            printf(ACYN "");
+            break;
+        case INFO:
+            printf(ABLU "");
+            break;
+        case WARN:
+            printf(AYEL "");
+            break;
+        case ERROR:
+            printf(ARED "");
             break;
     }
 }
